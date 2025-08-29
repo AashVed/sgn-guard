@@ -53,7 +53,7 @@ for step in range(100):
 
 ![Guard vs no‑guard](examples/compare_guard_vs_noguard.png)
 
-- One‑click artefacts: https://github.com/AashVed/sgn-guard/releases
+- One‑click artefacts: https://github.com/AashVed/sgn-guard/releases/tag/v0.1.1
   
 For the included traces: no‑guard/guard averages are ≈4.64× (grad_norm), ≈3.77× (state_norm), ≈35.71× (|loss|). Exact values vary with seed/hyper‑parameters.
 
