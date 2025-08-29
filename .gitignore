@@ -1,0 +1,33 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+.env
+.envrc
+.pytest_cache/
+
+# Dev tool caches
+.mypy_cache/
+.ruff_cache/
+
+# Test coverage
+.coverage
+coverage.xml
+htmlcov/
+
+# Packaging
+build/
+dist/
+
+# OS
+.DS_Store
+
+*.tex
+*.pdf
+answers.md
+text.md
+
+# Example-generated artifacts (not tracked; regenerate via scripts)
+examples/*.csv
+examples/*.json
