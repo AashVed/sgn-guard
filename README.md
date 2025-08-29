@@ -1,5 +1,7 @@
 # SGN‑Guard
 
+[![CI](https://github.com/AashVed/sgn-guard/actions/workflows/ci.yml/badge.svg)](https://github.com/AashVed/sgn-guard/actions/workflows/ci.yml)
+
 Certified‑style, stability‑first learning‑rate guard for decentralized training. Uses standard, non‑novel heuristics (gradient cosine, norm ratios, staleness) to reduce divergence under heterogeneity and asynchrony.
 
 - Package: `sgn_guard`
@@ -40,6 +42,35 @@ for step in range(100):
     guard.observe_staleness(steps_behind=0)
 
     guard.adjust_before_step()  # adapt LR conservatively
+    opt.step()
+```
+
+## Evidence at a glance
+- Guard vs no‑guard on a harder off‑diagonal bilinear game (same base LR):
+  - ~4–5× lower average gradient norm
+  - ~3–4× lower average state norm
+  - ~30–40× lower average |loss|
+
+![Guard vs no‑guard](examples/compare_guard_vs_noguard.png)
+
+- One‑click artefacts: https://github.com/AashVed/sgn-guard/releases
+  
+For the included traces: no‑guard/guard averages are ≈4.64× (grad_norm), ≈3.77× (state_norm), ≈35.71× (|loss|). Exact values vary with seed/hyper‑parameters.
+
+## Adapter seam: trainer loop integration
+```python
+from sgn_guard.guard import SGNGuard, SGNGuardConfig
+from sgn_guard.adapters.prime_rl import PrimeRLAdapter
+
+guard = SGNGuard(opt, SGNGuardConfig(lr_min=1e-5, lr_max=5e-2))
+adapter = PrimeRLAdapter(guard)
+
+for batch in loader:  # pseudo-code
+    loss = compute_loss(batch)
+    loss.backward()
+    # If available, pass observed staleness from runtime/transport
+    adapter.on_batch_begin(steps_behind=getattr(batch, "steps_behind", 0))
+    adapter.on_before_optimizer_step()  # adjusts LR conservatively
     opt.step()
 ```
 
@@ -97,8 +128,6 @@ python examples/plot_compare.py
 # examples/compare_guard_vs_noguard.png
 ```
 
-![Guard vs no‑guard](examples/compare_guard_vs_noguard.png)
-
 ### What the plot shows
 - **Learning rate**: guard typically takes an early reduction (e.g., 0.1 → 0.05) and holds steady; no‑guard stays constant.
 - **Gradient cosine**: guard maintains higher alignment (closer to 1.0) vs no‑guard.
@@ -106,12 +135,7 @@ python examples/plot_compare.py
 - **State norm**: stability indicator ‑ lower with guard.
 - **|Loss| (log‑scale)**: lower and less explosive oscillations with guard.
 
-### Typical result (toy off‑diagonal bilinear game, varies with seed/LR)
-- ~4–5× lower average gradient norm.
-- ~3–4× lower average state norm.
-- ~30–40× lower average |loss|.
-
-Numbers are reproducible from the JSON summaries and per‑step CSV traces above. Heuristics only; non‑novel.
+ 
 
 ## Design notes
 - Heuristics only. No novel techniques disclosed.

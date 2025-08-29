@@ -26,8 +26,8 @@ dev = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/"
-Issues = "https://github.com/"
+Homepage = "https://github.com/AashVed/sgn-guard"
+Issues = "https://github.com/AashVed/sgn-guard/issues"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
